@@ -1,0 +1,4 @@
+options:
+  version:
+    type: string
+    description: "The version of npm-offline-registry to install."
