@@ -1,4 +1,4 @@
-from charms.nodejs import npm, node_dist_dir
+from charms.layer.nodejs import npm, node_dist_dir
 from charms.reactive import when, set_state
 
 
