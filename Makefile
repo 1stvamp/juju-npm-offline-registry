@@ -3,7 +3,7 @@ SERIES ?= xenial
 clean:
 	rm -rf trusty xenial
 
-build: clean
+build:
 	charm build -s $(SERIES)
 
 .PHONY: clean
