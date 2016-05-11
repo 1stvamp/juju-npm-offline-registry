@@ -5,6 +5,7 @@ from shutil import chown
 
 from charmhelpers.core import hookenv
 from charmhelpers.core.host import adduser, restart_on_change, user_exists
+from charmhelpers.core.templating import render
 from charms.layer.nodejs import npm, node_dist_dir
 from charms.reactive import when, set_state
 
