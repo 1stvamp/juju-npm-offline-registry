@@ -3,7 +3,7 @@ from os.path import join
 from charmhelpers.core import hookenv
 from charmhelpers.core.host import adduser, restart_on_change, user_exists
 from charms.layer.nodejs import npm, node_dist_dir
-from charms.reactive import when, set_state, when_file_changed
+from charms.reactive import when, set_state
 
 
 USER = 'npm-offline-registry'
