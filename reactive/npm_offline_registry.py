@@ -13,6 +13,7 @@ USER = 'npm-offline-registry'
 UPSTART_PATH = '/etc/init/npm-offline-registry.conf'
 
 
+@contextmanager
 def maintenance_status(msg):
     try:
         hookenv.status_set('maintenance', msg)
