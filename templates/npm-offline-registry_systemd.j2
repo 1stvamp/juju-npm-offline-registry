@@ -21,3 +21,24 @@ env ENABLE_NPM_FAILOVER={{ enable_failover }}
 env LOCAL_REGISTRY={{ local_registry }}
 
 exec {{ bin_path }}
+
+
+[Unit]
+Description=NPM offline registry cache and standalone registry
+
+[Service]
+Type=forking
+Environment=NPM_PATH={{ npm_cache_path }}
+Environment=REGISTRY_NAME={{ registry_name }}
+Environment=PORT=8080
+Environment=ENABLE_NPM_FAILOVER={{ enable_failover }}
+Environment=LOCAL_REGISTRY={{ local_registry }}
+WorkingDirectory={{ working_dir }}
+User={{ user }}
+Group={{ user }}
+ExecStart={{ bin_path }}
+Restart=on-failure
+RestartSec=15 5 
+
+[Install]
+WantedBy=multi-user.target

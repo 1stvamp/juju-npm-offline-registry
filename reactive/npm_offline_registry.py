@@ -11,7 +11,7 @@ from charms.reactive import when, set_state
 
 
 USER = 'npm-offline-registry'
-UPSTART_PATH = '/etc/init/npm-offline-registry.conf'
+SYSTEMD_PATH = '/lib/systemd/system/npm-offline-registry.service'
 
 
 @contextmanager
@@ -36,8 +36,8 @@ def get_cache(base_path, user):
     return cache_path
 
 
-def get_bin_path():
-    return 'node_modules/.bin/npm-offline-registry'
+def get_bin_path(base_path):
+    return join(base_path, 'node_modules/.bin/npm-offline-registry')
 
 
 @when('nodejs.available', 'config.changed.version')
@@ -52,7 +52,7 @@ def install():
 
 
 @when('config.changed', 'npm-offline-registry.installed')
-@restart_on_change({UPSTART_PATH: ['npm-offline-registry']}, stopstart=True)
+@restart_on_change({SYSTEMD_PATH: ['npm-offline-registry']}, stopstart=True)
 def configure():
     dist_dir = node_dist_dir()
     user = get_user()
@@ -63,10 +63,10 @@ def configure():
         config_ctx['working_dir'] = dist_dir
         config_ctx['user'] = user
         config_ctx['npm_cache_path'] = get_cache(dist_dir, user)
-        config_ctx['bin_path'] = get_bin_path()
+        config_ctx['bin_path'] = get_bin_path(dist_dir)
 
-        render(source='npm-offline-registry_upstart.j2',
-               target=UPSTART_PATH,
+        render(source='npm-offline-registry_systemd.j2',
+               target=SYSTEMD_PATH,
                owner='root',
                perms=0o744,
                context=config_ctx)
