@@ -3,7 +3,7 @@ from os.path import join
 from charmhelpers.core import hookenv
 from charmhelpers.core.host import adduser, restart_on_change, user_exists
 from charms.layer.nodejs import npm, node_dist_dir
-from charms.reactive import when, when_any, set_state, when_file_changed
+from charms.reactive import when, set_state, when_file_changed
 
 
 USER = 'npm-offline-registry'
@@ -30,7 +30,7 @@ def install():
         set_state('npm-offline-registry.installed')
 
 
-@when_any('config.changed', 'npm-offline-registry.installed')
+@when('config.changed', 'npm-offline-registry.installed')
 @restart_on_change({UPSTART_PATH: ['npm-offline-registry']}, stopstart=True)
 def configure():
     ensure_user_exists()
