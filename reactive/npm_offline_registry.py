@@ -14,12 +14,12 @@ UPSTART_PATH = '/etc/init/npm-offline-registry.conf'
 
 
 @contextmanager
-def maintenance_status(msg):
+def maintenance_status(begin, end):
     try:
-        hookenv.status_set('maintenance', msg)
+        hookenv.status_set('maintenance', begin)
         yield
     finally:
-        hookenv.status_unset('maintenance')
+        hookenv.status_set('maintenance', end)
 
 
 def get_user():
@@ -44,7 +44,8 @@ def install():
     version = hookenv.config('version')
     if version:
         pkg = 'npm-offline-registry@{}'.format(version)
-        with maintenance_status('Installing {} with NPM'.format(pkg)):
+        with maintenance_status('Installing {} with NPM'.format(pkg),
+                                '{} installed'.format(pkg)):
             npm('install {}'.format(pkg))
             set_state('npm-offline-registry.installed')
 
@@ -55,7 +56,8 @@ def configure():
     dist_dir = node_dist_dir()
     user = get_user()
 
-    with maintenance_status('Generating upstart configuration'):
+    with maintenance_status('Generating upstart configuration',
+                            'upstart configuration generated'):
         config_ctx = hookenv.config()
         config_ctx['working_dir'] = dist_dir
         config_ctx['user'] = user
