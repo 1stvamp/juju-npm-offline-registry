@@ -1,19 +1,18 @@
 name: npm-offline-registry
-summary: <Fill in summary here>
+summary: Alternative NPM registry, with optional upstream failover
 maintainer: Wes Mason <wes@1stvamp.org>
 description: |
-  <Multi-line description here>
+    npm-offline-registry enables you to deploy a cached NPM registry, which
+    can pull unknown packages from an upstream registry (e.g. registry.npmjs.org),
+    or operate in complete isolation as a private NPM registry.
 tags:
-  # Replace "misc" with one or more whitelisted tags from this list:
-  # https://jujucharms.com/docs/stable/authors-charm-metadata
-  - misc
+  - ops
+  - cache-proxy
 subordinate: false
 provides:
   website:
     interface: http
   nrpe-external-master:
     interface: nrpe-external-master
-    scope: container
   local-monitors:
     interface: local-monitors
-    scope: container

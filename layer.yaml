@@ -1,2 +1,7 @@
-includes: ['layer:basic', 'layer:nodejs']
+includes:
+  - 'layer:basic'
+  - 'layer:nodejs'
+  - 'interface:local-monitors'
+  - 'interface:nrpe-external-master'
+  - 'interface:http'
 repo: https://github.com/1stvamp/juju-npm-offline-registry.git

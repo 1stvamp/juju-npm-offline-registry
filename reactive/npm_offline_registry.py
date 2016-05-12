@@ -2,6 +2,7 @@ from contextlib import contextmanager
 from os import makedirs
 from os.path import join
 from shutil import chown
+from subprocess import check_call
 
 from charmhelpers.core import hookenv
 from charmhelpers.core.host import adduser, restart_on_change, user_exists
@@ -12,6 +13,7 @@ from charms.reactive import when, set_state
 
 USER = 'npm-offline-registry'
 SYSTEMD_PATH = '/lib/systemd/system/npm-offline-registry.service'
+UPSTART_PATH = '/etc/init/npm-offline-registry.conf'
 
 
 @contextmanager
@@ -40,6 +42,10 @@ def get_bin_path(base_path):
     return join(base_path, 'node_modules/.bin/npm-offline-registry')
 
 
+def is_systemd():
+     return check_call('ps -p1 | grep -q systemd', shell=True)
+
+
 @when('nodejs.available', 'config.changed.version')
 def install():
     version = hookenv.config('version')
@@ -52,10 +58,20 @@ def install():
 
 
 @when('config.changed', 'npm-offline-registry.installed')
-@restart_on_change({SYSTEMD_PATH: ['npm-offline-registry']}, stopstart=True)
+@restart_on_change({
+    SYSTEMD_PATH: ['npm-offline-registry'],
+    UPSTART_PATH: ['npm-offline-registry'],
+},
+stopstart=True)
 def configure():
     dist_dir = node_dist_dir()
     user = get_user()
+    if is_systemd():
+        conf_path = SYSTEMD_PATH
+        template_type = 'systemd'
+    else:
+        conf_path = UPSTART_PATH
+        template_type = 'upstart'
 
     with maintenance_status('Generating upstart configuration',
                             'upstart configuration generated'):
@@ -65,8 +81,22 @@ def configure():
         config_ctx['npm_cache_path'] = get_cache(dist_dir, user)
         config_ctx['bin_path'] = get_bin_path(dist_dir)
 
-        render(source='npm-offline-registry_systemd.j2',
-               target=SYSTEMD_PATH,
+        render(source='npm-offline-registry_{}.j2'.format(template_type),
+               target=conf_path,
                owner='root',
                perms=0o744,
                context=config_ctx)
+        set_state('npm-offline-registry.available')
+
+
+@when('local-monitors.available', 'nrpe-external-master.available',
+      'npm-offline-registry.available')
+def setup_nagios(nagios):
+    with maintenance_status('Creating Nagios check', 'Nagios check created'):
+        nagios.add_check(['/usr/lib/nagios/plugins/check_procs',
+                          '-c', '1:', '-a', 'bin/npm-offline-registry'],
+                         name='check_npm-offline-registry_procs',
+                         description='Verify at least one npm-offline-registry'
+                                     'process is running',
+                         context=hookenv.config('nagios_context'),
+                         unit= hookenv.local_unit())

@@ -1,28 +1,6 @@
 # This file is managed by Juju; ANY CHANGES WILL BE OVERWRITTEN
 #--------------------------------------------------------------
 
-description "NPM offline registry cache and standalone registry"
-
-start on runlevel [2345]
-stop on shutdown
-
-# If the process quits unexpectadly trigger a respawn
-respawn
-respawn limit 15 5
-
-setuid {{ user }}
-setgid {{ user }}
-chdir {{ working_dir }}
-
-env NPM_PATH={{ npm_cache_path }}
-env REGISTRY_NAME={{ registry_name }}
-env PORT=8080
-env ENABLE_NPM_FAILOVER={{ enable_failover }}
-env LOCAL_REGISTRY={{ local_registry }}
-
-exec {{ bin_path }}
-
-
 [Unit]
 Description=NPM offline registry cache and standalone registry
 
@@ -32,7 +10,7 @@ Environment=NPM_PATH={{ npm_cache_path }}
 Environment=REGISTRY_NAME={{ registry_name }}
 Environment=PORT=8080
 Environment=ENABLE_NPM_FAILOVER={{ enable_failover }}
-Environment=LOCAL_REGISTRY={{ local_registry }}
+Environment=LOCAL_REGISTRY={{ local_registry.rstrip('/') }}
 WorkingDirectory={{ working_dir }}
 User={{ user }}
 Group={{ user }}

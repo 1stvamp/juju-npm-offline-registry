@@ -10,6 +10,10 @@ options:
       type: boolean
       description: "Whether or not to fetch unknown packages from the upstream registry."
       default: true
-    local_registry:
-      type: string
-      description: "The externally accessable address for this registry."
+  local_registry:
+    type: string
+    description: "The externally accessable address for this registry."
+  enable_static_server:
+    type: boolean
+    description: "Optionally use a static file server to serve package tarballs."
+    default: true
