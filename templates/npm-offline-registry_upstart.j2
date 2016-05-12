@@ -6,6 +6,10 @@ description "NPM offline registry cache and standalone registry"
 start on runlevel [2345]
 stop on shutdown
 
+# If the process quits unexpectadly trigger a respawn
+respawn
+respawn limit 15 5
+
 setuid {{ user }}
 setgid {{ user }}
 chdir {{ working_dir }}

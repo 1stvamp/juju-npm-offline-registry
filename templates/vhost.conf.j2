@@ -1,6 +1,11 @@
 server {
-  listen 80;
+  listen {{ port }};
   server_name {{ server_name }};
+  root {{ cache_dir }};
+  rewrite ^/(.*)/-/.*-(.*)\.(.*) /$1/$2/package.$3 break;
+
+  location ~* ^/.*/.*/.* {
+  }
 
   location / {
     proxy_redirect      off;
@@ -12,8 +17,5 @@ server {
     proxy_set_header    Connection "";
     proxy_http_version  1.1;
     proxy_pass          http://0.0.0.0:8080;
-  }
-  location /.*/-/.* {
-    root {{ cache_dir }};
   }
 }

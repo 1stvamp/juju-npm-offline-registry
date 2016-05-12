@@ -5,7 +5,7 @@
 Description=NPM offline registry cache and standalone registry
 
 [Service]
-Type=forking
+Type=simple
 Environment=NPM_PATH={{ npm_cache_path }}
 Environment=REGISTRY_NAME={{ registry_name }}
 Environment=PORT=8080
@@ -15,6 +15,8 @@ WorkingDirectory={{ working_dir }}
 User={{ user }}
 Group={{ user }}
 ExecStart={{ bin_path }}
+Restart=on-failure
+RestartSec=15 5 
 
 [Install]
 WantedBy=multi-user.target
