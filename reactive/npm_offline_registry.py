@@ -9,6 +9,7 @@ from charmhelpers.core.host import adduser, restart_on_change, user_exists
 from charmhelpers.core.templating import render
 from charms.layer.nodejs import npm, node_dist_dir
 from charms.reactive import when, set_state
+from nginxlib import configure_site
 
 
 USER = 'npm-offline-registry'
@@ -40,6 +41,22 @@ def get_cache(base_path, user):
 
 def get_bin_path(base_path):
     return join(base_path, 'node_modules/.bin/npm-offline-registry')
+
+
+def get_local_registry_or_host(uri=False):
+    local_cache = hookenv.config('local_cache')
+
+    if local_cache:
+        if '://' not in local_cache:
+            return local_cache
+    else:
+        local_cache = 'http://{}'.format(hookenv.config('host'))
+
+    local_cache = local_cache.rstrip('/')
+    if uri:
+        return local_cache
+
+    return local_cache.split('://')[1]
 
 
 def is_systemd():
@@ -80,6 +97,8 @@ def configure():
         config_ctx['user'] = user
         config_ctx['npm_cache_path'] = get_cache(dist_dir, user)
         config_ctx['bin_path'] = get_bin_path(dist_dir)
+        config_ctx['local_registry_or_host_uri'] = get_local_registry_or_host(
+            uri=True)
 
         render(source='npm-offline-registry_{}.j2'.format(template_type),
                target=conf_path,
@@ -100,3 +119,12 @@ def setup_nagios(nagios):
                                      'process is running',
                          context=hookenv.config('nagios_context'),
                          unit= hookenv.local_unit())
+
+
+@when('nginx.available')
+def configure_nginx():
+    config_ctx = {
+        'server_name': get_local_registry_or_host(),
+        'cache_dir': get_cache(node_dist_dir(), get_user()),
+    }
+    configure_site('npm-offline-rgistry', 'vhost.conf.j2', **config_ctx)

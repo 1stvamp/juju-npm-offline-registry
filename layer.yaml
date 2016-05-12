@@ -1,6 +1,7 @@
 includes:
   - 'layer:basic'
   - 'layer:nodejs'
+  - 'layer:nginx'
   - 'interface:local-monitors'
   - 'interface:nrpe-external-master'
   - 'interface:http'

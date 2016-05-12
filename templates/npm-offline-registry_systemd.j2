@@ -10,13 +10,11 @@ Environment=NPM_PATH={{ npm_cache_path }}
 Environment=REGISTRY_NAME={{ registry_name }}
 Environment=PORT=8080
 Environment=ENABLE_NPM_FAILOVER={{ enable_failover }}
-Environment=LOCAL_REGISTRY={{ local_registry.rstrip('/') }}
+Environment=LOCAL_REGISTRY={{ local_registry_or_host_uri }}
 WorkingDirectory={{ working_dir }}
 User={{ user }}
 Group={{ user }}
 ExecStart={{ bin_path }}
-Restart=on-failure
-RestartSec=15 5 
 
 [Install]
 WantedBy=multi-user.target

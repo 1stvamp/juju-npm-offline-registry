@@ -6,10 +6,6 @@ description "NPM offline registry cache and standalone registry"
 start on runlevel [2345]
 stop on shutdown
 
-# If the process quits unexpectadly trigger a respawn
-respawn
-respawn limit 15 5
-
 setuid {{ user }}
 setgid {{ user }}
 chdir {{ working_dir }}
@@ -18,6 +14,6 @@ env NPM_PATH={{ npm_cache_path }}
 env REGISTRY_NAME={{ registry_name }}
 env PORT=8080
 env ENABLE_NPM_FAILOVER={{ enable_failover }}
-env LOCAL_REGISTRY={{ local_registry.rstrip('/') }}
+env LOCAL_REGISTRY={{ local_registry_or_host_uri }}
 
 exec {{ bin_path }}
