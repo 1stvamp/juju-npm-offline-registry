@@ -4,6 +4,7 @@ from os.path import join
 from shutil import chown
 from subprocess import check_call
 
+from charmhelpers import fetch
 from charmhelpers.core import hookenv
 from charmhelpers.core.host import adduser, restart_on_change, user_exists
 from charmhelpers.core.templating import render
@@ -67,6 +68,10 @@ def is_systemd():
 def install():
     version = hookenv.config('version')
     if version:
+        # npm-offline-registry relies on wget for non-isolated fetches from
+        # upstream registry, just in case let's always install it
+        fetch.apt_install(fetch.filter_installed_packages(['wget']))
+
         pkg = 'npm-offline-registry@{}'.format(version)
         with maintenance_status('Installing {} with NPM'.format(pkg),
                                 '{} installed'.format(pkg)):
