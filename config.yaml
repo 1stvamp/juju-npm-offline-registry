@@ -17,3 +17,9 @@ options:
     type: boolean
     description: "Optionally use a static file server to serve package tarballs."
     default: true
+  repo:
+    type: string
+    description: "Location for an SCM repository to install npm-offline-registry from, can be a git, hg or svn URI"
+  repo_type:
+    type: string
+    description: "Type of SCM to install from, when using the repo config option, can be git, hg or svn."
