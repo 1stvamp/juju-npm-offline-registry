@@ -203,3 +203,9 @@ def configure_nginx():
             'cache_dir': get_cache(node_dist_dir(), get_user()),
         }
         configure_site('npm-offline-rgistry', 'vhost.conf.j2', **config_ctx)
+        hookenv.open_port(hookenv.config('port'))
+
+
+@when('nginx.available', 'website.available')
+def configure_website(website):
+        website.configure(port=hookenv.config('port'))
