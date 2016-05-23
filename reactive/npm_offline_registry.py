@@ -109,6 +109,11 @@ def install_with_npm(version):
 def install_from_repo(repo, version):
     pkg = 'npm-offline-registry@{}'.format(version)
     dist_dir = node_dist_dir()
+    apt_pkg_map = {
+        'git': 'git-core',
+        'hg': 'mercurial',
+        'svn': 'subversion',
+    }
     repo_types = ('git', 'hg', 'svn')
 
     with maintenance_status('Installing {} from {}'.format(pkg, repo),
@@ -116,6 +121,9 @@ def install_from_repo(repo, version):
         repo_type = hookenv.config('repo_type').lower()
 
         if repo_type in repo_types:
+            # Ensure we have the required underlying SCM installed firtst
+            fetch.apt_install(
+                fetch.filter_installed_packages([apt_pkg_map[repo_type]]))
             # We use the excellent peru to pull in builds from SCM repos
             # but it requires a pregenerated YAML file on disk
             with NamedTemporaryFile() as f:
