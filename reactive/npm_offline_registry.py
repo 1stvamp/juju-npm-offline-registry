@@ -9,8 +9,9 @@ from charmhelpers import fetch
 from charmhelpers.core import hookenv
 from charmhelpers.core.host import adduser, restart_on_change, user_exists
 from charmhelpers.core.templating import render
+from charmhelpers.payload.execd import execd_run
 from charms.layer.nodejs import npm, node_dist_dir
-from charms.reactive import when, set_state
+from charms.reactive import only_once, set_state, when
 from nginxlib import configure_site
 
 
@@ -217,3 +218,11 @@ def configure_nginx():
 @when('nginx.available', 'website.available')
 def configure_website(website):
         website.configure(port=hookenv.config('port'))
+
+
+@hookenv.atstart
+@only_once
+def preinstall():
+    with maintenance_status('Running preinstallation hooks',
+                            'Preinstallation hooks finished'):
+        execd_run('charm-pre-install', die_on_error=True)
