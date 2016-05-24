@@ -1,3 +1,5 @@
 trusty
 deps
 xenial
+npm-offline-registry-src
+exec.d

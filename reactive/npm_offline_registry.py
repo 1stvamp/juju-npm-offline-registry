@@ -1,13 +1,18 @@
 from contextlib import contextmanager
 from os import makedirs
-from os.path import join
+from os.path import dirname, exists, join
 from shutil import chown
 from subprocess import check_call
 from tempfile import NamedTemporaryFile
 
 from charmhelpers import fetch
 from charmhelpers.core import hookenv
-from charmhelpers.core.host import adduser, restart_on_change, user_exists
+from charmhelpers.core.host import (
+    adduser,
+    restart_on_change,
+    service_restart,
+    user_exists,
+)
 from charmhelpers.core.templating import render
 from charmhelpers.payload.execd import execd_run
 from charms.layer.nodejs import npm, node_dist_dir
@@ -86,7 +91,11 @@ def is_systemd():
 @when('nodejs.available', 'config.changed.version')
 def install():
     version = hookenv.config('version')
-    if version:
+    src_path = join(dirname(dirname(__file__)), 'npm-offline-registry-src')
+
+    if exists(src_path):
+        install_from_charm_dir(src_path)
+    elif version:
         # npm-offline-registry relies on wget for non-isolated fetches from
         # upstream registry, just in case let's always install it
         fetch.apt_install(fetch.filter_installed_packages(['wget']))
@@ -104,7 +113,29 @@ def install_with_npm(version):
     with maintenance_status('Installing {} with NPM'.format(pkg),
                             '{} installed'.format(pkg)):
         npm('install {}'.format(pkg))
+
+        service_restart('npm-offline-registry')
         set_state('npm-offline-registry.installed')
+
+
+def install_from_charm_dir(src_path):
+    pkg = 'npm-offline-registry'
+    dist_dir = node_dist_dir()
+    wildcard_src = join(src_path, '*')
+    wildcard_dest = join(dist_dir, '*')
+
+    with maintenance_status('Installing {} from charm directory'.format(pkg),
+                            '{} installed'.format(pkg)):
+        check_call(['rm', '-r', wildcard_dest])
+        check_call(['cp', '-R', wildcard_src, wildcard_dest])
+
+        # If the vendored payload did not bundle the Node.js dependencies for
+        # npm-offline-registry, then let's try to install them with NPM
+        if not exists(join(dist_dir, 'node_modules')):
+            npm('install')
+
+    service_restart('npm-offline-registry')
+    set_state('npm-offline-registry.installed')
 
 
 def install_from_repo(repo, version):
@@ -148,6 +179,7 @@ def install_from_repo(repo, version):
             if not exists(join(dist_dir, 'node_modules')):
                 npm('install')
 
+            service_restart('npm-offline-registry')
             set_state('npm-offline-registry.installed')
         else:
             raise ValueError('Unknown repo_type "{}",not one of {}'.format(
