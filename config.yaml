@@ -6,10 +6,10 @@ options:
     type: string
     description: "The name of the upstream registry used to generate the NPM cache."
     default: "registry.npmjs.org"
-    enable_failover:
-      type: boolean
-      description: "Whether or not to fetch unknown packages from the upstream registry."
-      default: true
+  enable_failover:
+    type: boolean
+    description: "Whether or not to fetch unknown packages from the upstream registry."
+    default: true
   local_registry:
     type: string
     description: "The externally accessable address for this registry."
