@@ -122,11 +122,11 @@ def install_from_charm_dir(src_path):
     pkg = 'npm-offline-registry'
     dist_dir = node_dist_dir()
     wildcard_src = join(src_path, '*')
-    wildcard_dest = join(dist_dir, '*')
+    wildcard_dest = join(dist_dir.rstrip('.'), '*')
 
     with maintenance_status('Installing {} from charm directory'.format(pkg),
                             '{} installed'.format(pkg)):
-        check_call(['rm', '-r', wildcard_dest])
+        check_call(['rm', '-rf', wildcard_dest])
         check_call(['cp', '-R', wildcard_src, wildcard_dest])
 
         # If the vendored payload did not bundle the Node.js dependencies for
