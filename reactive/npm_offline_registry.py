@@ -127,7 +127,7 @@ def install_from_charm_dir(src_path):
     with maintenance_status('Installing {} from charm directory'.format(pkg),
                             '{} installed'.format(pkg)):
         check_call(['rm', '-rf', wildcard_dest])
-        check_call(['cp', '-R', wildcard_src, wildcard_dest])
+        check_call(['cp', '-R', wildcard_src, dist_dir])
 
         # If the vendored payload did not bundle the Node.js dependencies for
         # npm-offline-registry, then let's try to install them with NPM
