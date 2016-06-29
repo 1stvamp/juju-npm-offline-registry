@@ -85,7 +85,7 @@ def get_local_registry_or_host(uri=False):
 def is_systemd():
     """Helper that returns `True` if the PID1 init system is systemd.
     """
-    return check_call('ps -p1 | grep -q systemd', shell=True)
+    return check_call('ps -p1 | grep -q systemd', shell=True) == 0
 
 
 @when('nodejs.available', 'config.changed.version')
@@ -204,7 +204,8 @@ def configure():
         conf_path = UPSTART_PATH
         template_type = 'upstart'
 
-    with maintenance_status('Generating upstart configuration',
+    with maintenance_status('Generating {} configuration'.format(
+                                template_type),
                             'upstart configuration generated'):
         config_ctx = hookenv.config()
         config_ctx['working_dir'] = dist_dir
