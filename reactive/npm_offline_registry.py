@@ -58,7 +58,13 @@ def get_bin_path(base_path):
     """Helper that returns the correct path to npm-offline-registry,
     regardless of if it was installed with NPM or from a repository.
     """
-    return join(base_path, 'node_modules/.bin/npm-offline-registry')
+    www_path = join(base_path, 'bin/www')
+    if exists(www_path):
+        p = www_path
+    else:
+        p = join(base_path, 'node_modules/.bin/npm-offline-registry')
+
+    return p
 
 
 def get_local_registry_or_host(uri=False):
@@ -228,7 +234,7 @@ def configure():
 def setup_nagios(nagios):
     with maintenance_status('Creating Nagios check', 'Nagios check created'):
         nagios.add_check(['/usr/lib/nagios/plugins/check_procs',
-                          '-c', '1:', '-a', 'bin/npm-offline-registry'],
+                          '-c', '1:', '-a', get_bin_path()],
                          name='check_npm-offline-registry_procs',
                          description='Verify at least one npm-offline-registry'
                                      'process is running',
