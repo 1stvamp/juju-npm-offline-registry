@@ -218,8 +218,8 @@ def configure():
         config_ctx['user'] = user
         config_ctx['npm_cache_path'] = get_cache(dist_dir, user)
         config_ctx['bin_path'] = get_bin_path(dist_dir)
-        config_ctx['enable_offline_failover'] = str(
-            config_ctx['enable_offline_failover']).lower()
+        config_ctx['enable_failover'] = str(
+            config_ctx['enable_failover']).lower()
         config_ctx['local_registry_or_host_uri'] = get_local_registry_or_host(
             uri=True)
 
