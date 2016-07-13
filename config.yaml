@@ -23,3 +23,6 @@ options:
   repo_type:
     type: string
     description: "Type of SCM to install from, when using the repo config option, can be git, hg or svn."
+  cache_dir:
+    type: string
+    description: "Optional NPM module cache dir pathe (can be used to rsync data to units)."

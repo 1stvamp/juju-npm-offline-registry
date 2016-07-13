@@ -45,12 +45,11 @@ def get_user():
 
 
 def get_cache(base_path, user):
-    """Helper that ensures a cache data directory exists in our app dir, with
-    correct permissions and returns the path.
+    """Helper to get the use provided cache dir or the vendored path.
     """
-    cache_path = join(base_path, 'cache-data')
-    makedirs(cache_path, exist_ok=True)
-    chown(cache_path, user=user)
+    cache_path = hookenv.config('cache_dir')
+    if not cache_path:
+        cache_path = join(base_path, 'cache-data')
     return cache_path
 
 
